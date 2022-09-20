@@ -1,10 +1,8 @@
 package com.example.todobackend.data;
 
-import com.example.todobackend.model.TodoModel;
 import org.springframework.data.annotation.PersistenceCreator;
 
 import javax.persistence.*;
-import java.net.URI;
 import java.util.UUID;
 
 @Entity
@@ -27,10 +25,10 @@ public class TodoEntity {
     }
 
     @PersistenceCreator
-    public TodoEntity(String title, Boolean completed, Integer order) {
+    public TodoEntity(String title, Integer order) {
         this.id = UUID.randomUUID();
         this.title = title;
-        this.completed = completed;
+        this.completed = false;
         this.order = order;
     }
 

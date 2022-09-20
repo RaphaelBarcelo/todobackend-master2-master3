@@ -1,58 +1,67 @@
 package com.example.todobackend.view;
 
-import com.example.todobackend.view.TodoCreate;
-import com.example.todobackend.view.TodoUpdate;
-import com.example.todobackend.model.TodoModel;
-import com.example.todobackend.data.TodoRepository;
-import com.example.todobackend.service.TodoServiceImp;
+import com.example.todobackend.domain.model.TodoModel;
+import com.example.todobackend.domain.service.TodoService;
+import com.example.todobackend.view.dto.TodoCreate;
+import com.example.todobackend.view.dto.TodoDto;
+import com.example.todobackend.view.dto.TodoUpdate;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
-import java.util.*;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 
 @RestController
-@RequestMapping
+@RequestMapping("/todos")
 public class Controller {
-    private final TodoServiceImp todoServiceImp;
+    private final TodoService todoService;
 
-    public Controller(TodoRepository todoRepository) {
-        this.todoServiceImp = new TodoServiceImp(todoRepository);
+    public Controller(TodoService todoService) {
+        this.todoService = todoService;
     }
 
     @GetMapping //(method = RequestMethod.GET, value = "/")
-    public List<TodoModel> getTodos(){
-        return todoServiceImp.getAll();
+    public List<TodoDto> getTodos(){
+        return todoService.getAll().stream().map(
+                todoModel -> new TodoDto(todoModel, getUrl(todoModel))
+            ).toList();
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<TodoModel> getToDoById(@PathVariable("id")UUID id){
-        return ResponseEntity.of(todoServiceImp.get(id));
+    public ResponseEntity<TodoDto> getToDoById(@PathVariable("id")UUID id){
+        Optional<TodoModel> todoModel = todoService.get(id);
+        return ResponseEntity.of(todoModel.map(todo -> new TodoDto(todo, getUrl(todo))));
     }
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public TodoModel createTodo(@RequestBody TodoCreate todoCreate) {
-        return todoServiceImp.create(todoCreate);
+    public TodoDto createTodo(@RequestBody TodoCreate todoCreate) {
+        TodoModel todoModel = todoService.create(todoCreate.getTitle());
+        return new TodoDto(todoModel, getUrl(todoModel));
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<TodoModel> update(@PathVariable int id, @RequestBody TodoUpdate todoUpdate) {
-        return ResponseEntity.of(todoServiceImp.update(id, todoUpdate));
+    @PatchMapping(value = "/{id}")
+    public ResponseEntity<TodoDto> update(@PathVariable UUID id, @RequestBody TodoUpdate todoUpdate) {
+        return ResponseEntity.of(todoService.update(
+                id, todoUpdate.getTitle(), todoUpdate.isCompleted(), todoUpdate.getOrder()).map(
+                    todo -> new TodoDto(todo, getUrl(todo))
+        ));
     }
     @DeleteMapping
     public void deleteAll(@RequestParam(required = false, defaultValue = "false") boolean completed) {
         if(completed){
-            todoServiceImp.deleteByCompleted(completed);
+            todoService.deleteByCompleted(completed);
         }else{
-            todoServiceImp.deleteAll();
+            todoService.deleteAll();
         }
     }
 
     @DeleteMapping("/{id}")
-    public void deleteTodo(@PathVariable int id) {
-        todoServiceImp.delete(id);
+    public void deleteTodo(@PathVariable UUID id) {
+        todoService.delete(id);
     }
 
     //toTodoDto
@@ -61,11 +70,4 @@ public class Controller {
                 .pathSegment("todos","{id}")
                 .buildAndExpand(todoModel.getId()).toUriString();
     }
-
-    /*@RequestMapping(method = RequestMethod.GET, value = "/{id}")
-    public @ResponseBody TodoItem getTodoById(@PathVariable int id) {
-        return todoServiceImp.get(id);
-    }*/
-
-
 }

@@ -1,4 +1,4 @@
-package com.example.todobackend.model;
+package com.example.todobackend.domain.model;
 
 import com.example.todobackend.data.TodoEntity;
 
@@ -14,7 +14,6 @@ public class TodoModel {
     @Id
     @GeneratedValue
     private UUID id;
-    private String url;
 
     public TodoModel() {
         this.completed = false;
@@ -48,14 +47,6 @@ public class TodoModel {
 
     public void setCompleted(Boolean completed) {
         this.completed = completed;
-    }
-
-    public String getUrl() {
-        return url;
-    }
-
-    public void setUrl(String url) {
-        this.url = url;
     }
 
     public Integer getOrder() {

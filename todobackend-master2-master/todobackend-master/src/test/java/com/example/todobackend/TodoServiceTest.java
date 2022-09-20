@@ -1,6 +1,7 @@
 package com.example.todobackend;
 
 import com.example.todobackend.data.TodoRepository;
+import com.example.todobackend.domain.service.TodoService;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -13,5 +14,5 @@ public class TodoServiceTest {
     private TodoRepository todoRepository;
 
     @InjectMocks
-    private RepositoryBasedToDoService repositoryBasedToDoService;
+    private TodoService todoService;
 }

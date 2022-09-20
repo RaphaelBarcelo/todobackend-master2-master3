@@ -1,19 +1,26 @@
-package com.example.todobackend.view;
+package com.example.todobackend.view.dto;
 
 import java.util.UUID;
 
-public class TodoUpdate {
+public class TodoCreate {
     private Boolean completed;
     private String title;
     private Integer order;
     private UUID id;
     private String url;
 
-    public TodoUpdate(Boolean completed, String title, Integer order, UUID id) {
-        this.completed = completed;
+    public TodoCreate(String title, Integer order) {
+        this.id = UUID.randomUUID();
         this.title = title;
+        this.completed = false;
         this.order = order;
-        this.id = id;
+    }
+
+    public TodoCreate(String title) {
+        this.id = UUID.randomUUID();
+        this.title = title;
+        this.completed = false;
+        this.order = 0;
     }
 
     public Boolean isCompleted() {
@@ -56,3 +63,4 @@ public class TodoUpdate {
         this.url = url;
     }
 }
+
